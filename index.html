@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地球物理重力修正計算報告</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        .data-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 5px solid #3498db;
+            margin: 20px 0;
+        }
+        .formula {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        pre {
+            background-color: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>重力測站數據計算報告</h1>
+
+    <div class="data-box">
+        <strong>測站已知數據：</strong><br>
+        緯度: 48.1195° N | 經度: 12.1878° E | 高度: 487.9 m <br>
+        實測重力: 980,717.39 mGal
+    </div>
+
+    <h2>(a) 陸地站點各項計算</h2>
+    
+    <p><strong>i) 理論重力 (Theoretical Gravity):</strong></p>
+    <div class="formula">
+        $$g_{th} = 978031.8 (1 + 0.0053024 \sin^2\phi - 0.0000058 \sin^2 2\phi) \approx 980,883.67 \text{ mGal}$$
+    </div>
+
+    <p><strong>ii) 空間修正 (Free-air Correction):</strong></p>
+    <div class="formula">
+        $$C_{FA} = 0.3086 \times 487.9 = 150.57 \text{ mGal}$$
+    </div>
+
+    <p><strong>iii) 布格修正 (Bouguer Correction):</strong></p>
+    <div class="formula">
+        $$C_B = 0.04193 \times 2.67 \times 487.9 = 54.62 \text{ mGal}$$
+    </div>
+
+    <p><strong>iv) 空間重力異常與 v) 布格重力異常:</strong></p>
+    <ul>
+        <li>$\Delta g_{FA} = 980717.39 + 150.57 - 980883.67 = \mathbf{-15.71 \text{ mGal}}$</li>
+        <li>$\Delta g_B = -15.71 - 54.62 = \mathbf{-70.33 \text{ mGal}}$</li>
+    </ul>
+
+    
+
+    <h2>(b) 海上站點計算 (水深 487.9 m)</h2>
+    <p>假設站點位於海平面（$h=0$），並考慮海水與地殼的密度差：</p>
+    <ul>
+        <li><strong>空間異常:</strong> $\Delta g_{FA} = 980717.39 - 980883.67 = \mathbf{-166.28 \text{ mGal}}$</li>
+        <li><strong>布格異常:</strong> $\Delta g_B = -166.28 + 0.04193 \times (2.67 - 1.03) \times 487.9 = \mathbf{-132.73 \text{ mGal}}$</li>
+    </ul>
+
+    <h2>Python 自動化實作</h2>
+    <pre>
+import math
+
+# 設定參數
+lat, h, g_obs = 48.1195, 487.9, 980717.39
+rho_c, rho_w = 2.67, 1.03
+
+# 計算理論重力
+phi = math.radians(lat)
+g_th = 978031.8 * (1 + 0.0053024 * math.sin(phi)**2 - 0.0000058 * math.sin(2*phi)**2)
+
+# 輸出結果... (詳見代碼註解)
+print(f"Land FA Anomaly: {g_obs + 0.3086*h - g_th:.2f}")
+    </pre>
+
+    <div class="footer">
+        © 2025 地球物理學計算工具 - 採用 1967 國際重力公式
+    </div>
+</div>
+
+</body>
+</html>
