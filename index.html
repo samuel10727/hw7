@@ -2,127 +2,110 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>重力觀測數據修正分析報告</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>重力勘測計算解析</title>
     <style>
-        body { font-family: 'Times New Roman', 'Microsoft JhengHei', serif; line-height: 1.5; color: #1a1a1a; max-width: 950px; margin: 20px auto; padding: 20px; background-color: #fcfcfc; }
-        .report-border { border: 2px solid #333; padding: 30px; background: white; box-shadow: 5px 5px 15px rgba(0,0,0,0.05); }
-        h1 { text-align: center; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        h2 { border-left: 5px solid #2c3e50; padding-left: 10px; margin-top: 30px; font-size: 1.25em; background: #f8f9fa; }
-        .data-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .data-table td, .data-table th { border: 1px solid #ddd; padding: 8px 12px; }
-        .data-table th { background-color: #f2f2f2; width: 30%; text-align: left; }
-        .formula-block { background: #fdfdfd; border: 1px solid #eee; padding: 15px; margin: 10px 0; text-align: center; }
-        .result-highlight { color: #d35400; font-weight: bold; }
-        pre { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 4px; font-size: 13px; overflow-x: auto; }
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .summary-table th { background: #2c3e50; color: white; }
-        .summary-table td, .summary-table th { border: 1px solid #333; padding: 10px; text-align: center; }
+        body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 20px auto; padding: 20px; background-color: #f4f7f9; }
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 25px; }
+        .data-box { background-color: #eef2f7; padding: 15px; border-left: 5px solid #3498db; margin: 20px 0; }
+        .formula { background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; font-family: "Courier New", Courier, monospace; overflow-x: auto; }
+        .step { margin-bottom: 15px; }
+        .highlight { font-weight: bold; color: #e74c3c; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #3498db; color: white; }
     </style>
 </head>
 <body>
 
-<div class="report-border">
-    <h1>Gravity Station Data Analysis</h1>
+<div class="container">
+    <h1>重力測站數據計算與分析</h1>
 
-    <h2>1. 原始觀測數據 (Input Parameters)</h2>
-    <table class="data-table">
-        <tr><th>緯度 ($\phi$)</th><td>48.1195° N</td></tr>
-        <tr><th>經度 ($\lambda$)</th><td>12.1878° E</td></tr>
-        <tr><th>測站高度 ($h$)</th><td>487.9 m</td></tr>
-        <tr><th>實測重力值 ($g_{obs}$)</th><td>980,717.39 mGal</td></tr>
-        <tr><th>假設密度 ($\rho_{地殼}, \rho_{海水}$)</th><td>2.67 g/cm³, 1.03 g/cm³</td></tr>
+    <h2>1. 原始數據 (Given Data)</h2>
+    <div class="data-box">
+        <ul>
+            <li><strong>緯度 (&phi;):</strong> 48.1195&deg; N</li>
+            <li><strong>高度 (h):</strong> 487.9 m</li>
+            <li><strong>觀測重力 (g<sub>obs</sub>):</strong> 980,717.39 mGal</li>
+            <li><strong>假設地殼密度 (&rho;):</strong> 2.67 g/cm&sup3; (2670 kg/m&sup3;)</li>
+            <li><strong>海水密度 (&rho;<sub>w</sub>):</strong> 1.03 g/cm&sup3;</li>
+        </ul>
+    </div>
+
+    
+    <h2>2. 問題 (a) 計算步驟</h2>
+
+    <div class="step">
+        <strong>i) 理論重力 (Theoretical Gravity, g<sub>th</sub>):</strong><br>
+        使用 1967 國際重力公式：<br>
+        <div class="formula">
+            g<sub>th</sub> = 978031.85 (1 + 0.00527889 sin&sup2;&phi; + 0.00002346 sin&sup4;&phi;) mGal
+        </div>
+        代入 &phi; = 48.1195&deg;:<br>
+        g<sub>th</sub> &asymp; <strong>980,904.34 mGal</strong>
+    </div>
+
+    <div class="step">
+        <strong>ii) 自由空氣修正 (Free-Air Correction, FAC):</strong><br>
+        修正公式：FAC = 0.3086 &times; h<br>
+        FAC = 0.3086 &times; 487.9 = <strong>150.57 mGal</strong>
+    </div>
+
+    <div class="step">
+        <strong>iii) 布格修正 (Bouger Correction, BC):</strong><br>
+        修正公式：BC = 0.04193 &times; &rho; &times; h<br>
+        BC = 0.04193 &times; 2.67 &times; 487.9 = <strong>54.62 mGal</strong>
+    </div>
+
+    <div class="step">
+        <strong>iv) 自由空氣重力異常 (Free-Air Anomaly, &Delta;g<sub>FA</sub>):</strong><br>
+        公式：&Delta;g<sub>FA</sub> = g<sub>obs</sub> + FAC - g<sub>th</sub><br>
+        &Delta;g<sub>FA</sub> = 980,717.39 + 150.57 - 980,904.34 = <strong>-36.38 mGal</strong>
+    </div>
+
+    <div class="step">
+        <strong>v) 布格重力異常 (Bouger Anomaly, &Delta;g<sub>B</sub>):</strong><br>
+        公式：&Delta;g<sub>B</sub> = &Delta;g<sub>FA</sub> - BC<br>
+        &Delta;g<sub>B</sub> = -36.38 - 54.62 = <strong>-91.00 mGal</strong>
+    </div>
+
+    <hr>
+
+    <h2>3. 問題 (b) 海洋環境重計算</h2>
+    <p>當觀測站位於海平面 (h=0)，但下方有 487.9m 深的水層時：</p>
+    <ul>
+        <li><strong>FAC:</strong> 因為觀測點就在海平面，h=0，故 <span class="highlight">FAC = 0</span>。</li>
+        <li><strong>&Delta;g<sub>FA</sub>:</strong> g<sub>obs</sub> - g<sub>th</sub> = 980,717.39 - 980,904.34 = <span class="highlight">-186.95 mGal</span>。</li>
+        <li><strong>海洋布格修正:</strong> 需要補償水與地殼岩石之間的密度差異 (&rho; - &rho;<sub>w</sub>)。<br>
+            BC<sub>ocean</sub> = 0.04193 &times; (2.67 - 1.03) &times; 487.9 = <strong>33.55 mGal</strong>。
+        </li>
+        <li><strong>&Delta;g<sub>B (Ocean)</sub>:</strong> &Delta;g<sub>FA</sub> + BC<sub>ocean</sub> = -186.95 + 33.55 = <span class="highlight">-153.40 mGal</span>。</li>
+    </ul>
+
+    <h2>4. 總結表格</h2>
+    <table>
+        <tr>
+            <th>項目</th>
+            <th>陸地情況 (a)</th>
+            <th>海洋情況 (b)</th>
+        </tr>
+        <tr>
+            <td>理論重力 (mGal)</td>
+            <td>980,904.34</td>
+            <td>980,904.34</td>
+        </tr>
+        <tr>
+            <td>自由空氣異常 (mGal)</td>
+            <td>-36.38</td>
+            <td>-186.95</td>
+        </tr>
+        <tr>
+            <td>布格異常 (mGal)</td>
+            <td>-91.00</td>
+            <td>-153.40</td>
+        </tr>
     </table>
-
-    <h2>2. (a) 陸地測站修正計算 (Land Station)</h2>
-    
-    <p><strong>i. 理論重力 (IGF 1967):</strong></p>
-    <div class="formula-block">
-        $$g_{th} = 978031.8 \left(1 + 0.0053024 \sin^2\phi - 0.0000058 \sin^2 2\phi\right)$$
-        計算結果: <span class="result-highlight">980,883.67 mGal</span>
-    </div>
-
-    <p><strong>ii. 空間修正 (Free-air Correction, $C_{FA}$):</strong></p>
-    <div class="formula-block">
-        $$C_{FA} = 0.3086 \times h = 0.3086 \times 487.9 = \mathbf{150.57 \text{ mGal}}$$
-    </div>
-
-    <p><strong>iii. 布格修正 (Bouguer Correction, $C_B$):</strong></p>
-    <div class="formula-block">
-        $$C_B = 0.04193 \times \rho \times h = 0.04193 \times 2.67 \times 487.9 = \mathbf{54.62 \text{ mGal}}$$
-    </div>
-
-    
-
-    <p><strong>iv & v. 重力異常值 (Gravity Anomalies):</strong></p>
-    <div class="formula-block">
-        $\Delta g_{FA} = g_{obs} + C_{FA} - g_{th} = \mathbf{-15.71 \text{ mGal}}$<br>
-        $\Delta g_B = \Delta g_{FA} - C_B = \mathbf{-70.33 \text{ mGal}}$
-    </div>
-
-    <h2>3. (b) 海上測站修正計算 (Ocean Station)</h2>
-    <p>條件：站點位於海平面 ($h=0$)，下方水深 $d = 487.9$ m。</p>
-    <div class="formula-block">
-        空間異常: $\Delta g_{FA} = g_{obs} - g_{th} = \mathbf{-166.28 \text{ mGal}}$<br>
-        布格異常: $\Delta g_B = \Delta g_{FA} + 0.04193(\rho_c - \rho_w)d = \mathbf{-132.73 \text{ mGal}}$
-    </div>
-
-    <h2>4. 數據彙整 (Summary Table)</h2>
-    <table class="summary-table">
-        <thead>
-            <tr>
-                <th>分析項目</th>
-                <th>陸地站點 (487.9m)</th>
-                <th>海上站點 (水深 487.9m)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>空間重力異常 ($\Delta g_{FA}$)</td>
-                <td class="result-highlight">-15.71 mGal</td>
-                <td class="result-highlight">-166.28 mGal</td>
-            </tr>
-            <tr>
-                <td>布格重力異常 ($\Delta g_B$)</td>
-                <td class="result-highlight">-70.33 mGal</td>
-                <td class="result-highlight">-132.73 mGal</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h2>5. Python 實作腳本 (Python Implementation)</h2>
-    <pre>
-import math
-
-def solve_gravity():
-    # Constants
-    lat, h, g_obs = 48.1195, 487.9, 980717.39
-    rho_c, rho_w = 2.67, 1.03
-    
-    # 1. Theoretical Gravity
-    phi = math.radians(lat)
-    g_th = 978031.8 * (1 + 0.0053024*math.sin(phi)**2 - 0.0000058*math.sin(2*phi)**2)
-    
-    # 2. Land Calculations
-    c_fa = 0.3086 * h
-    c_b = 0.04193 * rho_c * h
-    dg_fa_land = g_obs + c_fa - g_th
-    dg_b_land = dg_fa_land - c_b
-    
-    # 3. Ocean Calculations
-    dg_fa_ocean = g_obs - g_th
-    dg_b_ocean = dg_fa_ocean + 0.04193 * (rho_c - rho_w) * h
-    
-    return {
-        "Land": (dg_fa_land, dg_b_land),
-        "Ocean": (dg_fa_ocean, dg_b_ocean)
-    }
-
-results = solve_gravity()
-print(f"Land Anomalies: FA={results['Land'][0]:.2f}, B={results['Land'][1]:.2f}")
-print(f"Ocean Anomalies: FA={results['Ocean'][0]:.2f}, B={results['Ocean'][1]:.2f}")
-    </pre>
 </div>
 
 </body>
